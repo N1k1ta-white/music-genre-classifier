@@ -1064,15 +1064,15 @@ linked_average = linkage(X_sample, method='average')
 # %%
 fig, axes = plt.subplots(1, 3, figsize=(18, 7))
 
-dendrogram(linked, truncate_mode='level', p=5, ax=axes[0])
+dendrogram(linked, truncate_mode='level', p=8, ax=axes[0])
 axes[0].set_title("Hierarchical Clustering Dendrogram (Super-Genres) (Ward Linkage)")
 axes[0].axhline(y=90, color='r', linestyle='-')
 
-dendrogram(linked_complete, truncate_mode='level', p=5, ax=axes[1])
+dendrogram(linked_complete, truncate_mode='level', p=8, ax=axes[1])
 axes[1].set_title("Hierarchical Clustering Dendrogram (Super-Genres) (Complete Linkage)")
 axes[1].axhline(y=10.5, color='r', linestyle='-')
 
-dendrogram(linked_average, truncate_mode='level', p=5, ax=axes[2])
+dendrogram(linked_average, truncate_mode='level', p=8, ax=axes[2])
 axes[2].set_title("Hierarchical Clustering Dendrogram (Super-Genres) (Average Linkage)")
 axes[2].axhline(y=6.2, color='r', linestyle='-')
 
@@ -1083,14 +1083,15 @@ plt.show()
 import matplotlib.pyplot as plt
 import numpy as np
 
+last_number_of_distances = 110
 # Взимаме последните 20 дистанции за всеки linkage метод
-last = linked[-20:, 2]
+last = linked[-last_number_of_distances:, 2]
 last_rev = last[::-1]
 
-last_complete = linked_complete[-20:, 2]
+last_complete = linked_complete[-last_number_of_distances:, 2]
 last_rev_complete = last_complete[::-1]
 
-last_average = linked_average[-20:, 2]
+last_average = linked_average[-last_number_of_distances:, 2]
 last_rev_average = last_average[::-1]
 
 idxs = np.arange(1, len(last) + 1)
@@ -1127,6 +1128,14 @@ plt.show()
 # %%
 k=7
 
+# %% [markdown]
+# ### Grid Search за оптимално k
+#
+# За да изберем най-добрия брой клъстери, ще изпълним grid search с различни метрики за оценка:
+# - **Silhouette Score** - мери колко добре всеки обект пасва на своя клъстър (стойности от -1 до 1, по-високи са по-добри)
+# - **Calinski-Harabasz Score** - съотношение на между-клъстерна и вътрешно-клъстерна дисперсия (по-високо е по-добре)
+# - **Davies-Bouldin Score** - средна прилика между клъстери (по-ниско е по-добре)
+
 # %%
 import numpy as np
 from sklearn.cluster import AgglomerativeClustering
@@ -1152,6 +1161,53 @@ knn.fit(X_sample, labels)
 
 # %%
 labels_full = knn.predict(X_clust_scaled)
+
+# %%
+from sklearn.metrics import silhouette_score, calinski_harabasz_score, davies_bouldin_score
+
+k_range = [2, 5, 7, 11, 15, 20, 25, 30, 40, 50]
+
+silhouette_scores_sampled = []
+calinski_scores_sampled = []
+davies_bouldin_scores_sampled = []
+
+silhouette_scores = []
+calinski_scores = []
+davies_bouldin_scores = []
+
+for k_value in k_range:
+    model_temp = AgglomerativeClustering(n_clusters=k_value, linkage='ward')
+    labels_temp = model_temp.fit_predict(X_sample)
+
+    knn = KNeighborsClassifier(n_neighbors=k_value)
+    knn.fit(X_sample, labels_temp)
+    
+    labels_full = knn.predict(X_clust_scaled)
+
+    sil_score = silhouette_score(X_clust_scaled, labels_full)
+    cal_score = calinski_harabasz_score(X_clust_scaled, labels_full)
+    db_score = davies_bouldin_score(X_clust_scaled, labels_full)
+
+    sil_score_sampled = silhouette_score(X_sample, labels_temp)
+    cal_score_sampled = calinski_harabasz_score(X_sample, labels_temp)
+    db_score_sampled = davies_bouldin_score(X_sample, labels_temp)
+
+    silhouette_scores.append(sil_score)
+    calinski_scores.append(cal_score)
+    davies_bouldin_scores.append(db_score)
+    
+    silhouette_scores_sampled.append(sil_score_sampled)
+    calinski_scores_sampled.append(cal_score_sampled)
+    davies_bouldin_scores_sampled.append(db_score_sampled)
+    
+    print("Sampled")
+    print(f"{k_value:<5} {sil_score_sampled:<15.4f} {cal_score_sampled:<20.2f} {db_score_sampled:<20.4f}")
+    print("Full")
+    print(f"{k_value:<5} {sil_score:<15.4f} {cal_score:<20.2f} {db_score:<20.4f}")
+
+# %%
+optimal_k = np.partition(k_range, -1)[-5:]
+print(f"\nИзползване на оптималното k = {optimal_k} за финално клъстеризиране...")
 
 
 # %%
