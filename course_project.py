@@ -1983,14 +1983,16 @@ df_classified.head()
 df_classified.shape
 
 # %%
-df_classified = df_classified[feature_cols + [target_col]].copy()
+df_classified = df_classified[feature_cols + [target_col, 'class']].copy()
 df_classified.drop(['popularity', 'duration_ms'], axis=1, inplace=True)
 df_classified.head()
 
 # %%
 X_knn = df_classified[audio_features].values
-y_knn = df_classified['track_genre'].values
+y_knn = df_classified['class'].values
 
 # %%
 y_model = df_classified['track_genre'].values
 X_model = df_classified.drop(['track_genre'], axis=1).values
+
+# %%
