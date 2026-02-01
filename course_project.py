@@ -1552,4 +1552,12 @@ contingency_table = visualize_cluster_distribution(df_clust[df_clust['cluster_1_
 # Top Genres: Opera (4.5%), Romance, Cantopop, Bluegrass.
 # The Vibe: 🤷 Ambiguous.
 
-# %%
+# %% [markdown]
+# | Super Class | Name | Composition (Source) | Sonic Profile |
+# |------------|------|---------------------|---------------|
+# | Class 1 | HEAVY & AGGRESSIVE | Cluster 0 (Sub 1) + Cluster 7 | Distorted Guitars, High Energy, Screaming Vocals. (Metal, Punk, Grunge). |
+# | Class 2 | HIGH-VOLTAGE ELECTRONIC | Cluster 0 (Sub 3) + Cluster 1 | Synthetic, Fast, Repetitive, Aggressive. (Techno, Trance, Hardstyle, DnB). |
+# | Class 3 | CLUB & MODERN POP | Cluster 0 (Sub 2) + Cluster 2 (Sub 0) | 4/4 Beats, Polished Production, Radio Friendly. (House, Disco, Pop, EDM). |
+# | Class 4 | URBAN & GROOVE | Cluster 2 (Sub 3) + Cluster 8 | Broken Beats, Bass Heavy, Syncopated. (Hip-Hop, Reggaeton, Funk, Dancehall). |
+# | Class 5 | ORGANIC & ROOTS | Cluster 2 (Sub 1+2) + Cluster 4 (Sub 0+2) + Cluster 3 | Acoustic Instruments, Human Rhythms, Warm. (Jazz, Folk, Salsa, Country, Samba). |
+# | Class 6 | ATMOSPHERIC & DRAMATIC | Cluster 6 + Cluster 9 + Cluster 4 (Sub 1) | Low Energy or Orchestral, Mood-based. (Classical, Opera, Ambient, Study). |
