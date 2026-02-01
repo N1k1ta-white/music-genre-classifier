@@ -1066,15 +1066,15 @@ fig, axes = plt.subplots(1, 3, figsize=(18, 7))
 
 dendrogram(linked, truncate_mode='level', p=8, ax=axes[0])
 axes[0].set_title("Hierarchical Clustering Dendrogram (Super-Genres) (Ward Linkage)")
-axes[0].axhline(y=90, color='r', linestyle='-')
+axes[0].axhline(y=96, color='r', linestyle='-')
 
 dendrogram(linked_complete, truncate_mode='level', p=8, ax=axes[1])
 axes[1].set_title("Hierarchical Clustering Dendrogram (Super-Genres) (Complete Linkage)")
-axes[1].axhline(y=10.5, color='r', linestyle='-')
+# axes[1].axhline(y=10.5, color='r', linestyle='-')
 
 dendrogram(linked_average, truncate_mode='level', p=8, ax=axes[2])
 axes[2].set_title("Hierarchical Clustering Dendrogram (Super-Genres) (Average Linkage)")
-axes[2].axhline(y=6.2, color='r', linestyle='-')
+# axes[2].axhline(y=6.2, color='r', linestyle='-')
 
 plt.tight_layout()
 plt.show()
@@ -1083,7 +1083,7 @@ plt.show()
 import matplotlib.pyplot as plt
 import numpy as np
 
-last_number_of_distances = 110
+last_number_of_distances = 70
 # Взимаме последните 20 дистанции за всеки linkage метод
 last = linked[-last_number_of_distances:, 2]
 last_rev = last[::-1]
@@ -1143,8 +1143,6 @@ k=7
 from sklearn.cluster import AgglomerativeClustering
 
 # %%
-import numpy as np
-
 model = AgglomerativeClustering(n_clusters=k, linkage='ward')
 labels = model.fit_predict(X_sample)    
 
@@ -1381,5 +1379,177 @@ contingency_table = visualize_cluster_distribution(df_clust, labels_full)
 # Cluster 9: "The Background" (3.1k songs) - Work/study 
 # Content: Study, Guitar, IDM, Chill.
 
+# %%
+df_clust['cluster_1_layer'] = labels_full
+X_clust_0 = X_clust_scaled[df_clust['cluster_1_layer'] == 0]
+
+# %%
+linked_cluster_0 = linkage(X_clust_0, method='ward')
+
+
+# %%
+def plot_dendrogram_and_elbow(linked, last_number_of_distances=50, p=8, title_suffix=""):
+    last = linked[-last_number_of_distances:, 2]
+    last_rev = last[::-1]
+
+    idxs = np.arange(1, len(last) + 1)
+
+    fig, axes = plt.subplots(1, 2, figsize=(14, 6))
+    dendrogram(linked, truncate_mode='level', p=p, ax=axes[0])
+    axes[0].set_title(f"Hierarchical Clustering Dendrogram {title_suffix} (Ward Linkage)")
+
+    axes[1].plot(idxs, last_rev, label='Ward Distances')
+    axes[1].set_title(f'Elbow Method за избор на k {title_suffix}')
+    axes[1].set_xlabel('Брой клъстери (k)')
+    axes[1].set_ylabel('Разстояние (Ward linkage cost)')
+    axes[1].grid(True)
+
+    plt.show()
+
+
+# %%
+plot_dendrogram_and_elbow(linked_cluster_0, last_number_of_distances=30, p=4, title_suffix="(Cluster 0)")
+
+
+# %%
+def grid_search_agglomerative(X_clust, k_range):
+    silhouette_scores = []
+    calinski_scores = []
+    davies_bouldin_scores = []
+    
+    print(f"{'k':<5} {'Silhouette':<15} {'Calinski-Harabasz':<20} {'Davies-Bouldin':<20}")
+    for k_value in k_range:
+        model = AgglomerativeClustering(n_clusters=k_value, linkage='ward')
+        labels_full = model.fit_predict(X_clust)
+
+        sil_score = silhouette_score(X_clust, labels_full)
+        cal_score = calinski_harabasz_score(X_clust, labels_full)
+        db_score = davies_bouldin_score(X_clust, labels_full)
+
+        silhouette_scores.append(sil_score)
+        calinski_scores.append(cal_score)
+        davies_bouldin_scores.append(db_score)
+                
+        print(f"{k_value:<5} {sil_score:<15.4f} {cal_score:<20.2f} {db_score:<20.4f}")
+
+
+# %%
+k = [4, 5, 6, 7, 8]
+
+grid_search_agglomerative(X_clust_0, k)
+
+# %%
+k_cluster_0 = 4
+
+# %%
+model_clust_0 = AgglomerativeClustering(n_clusters=k_cluster_0, linkage='ward')
+labels_clust_0 = model_clust_0.fit_predict(X_clust_0)
+
+# %%
+contingency_table = visualize_cluster_distribution(df_clust[df_clust['cluster_1_layer'] == 0], labels_clust_0)
+
 # %% [markdown]
+# Cluster 0
 #
+# Sub-Cluster 1: The "Pure Metal" Pit (9,102 songs)
+# Top Genres: Metalcore, Death-Metal, Heavy-Metal, Grunge, Industrial, Punk.
+# Analysis: This cluster picked up almost all the guitar-based aggressive music. The "Electronic" noise is almost entirely gone.
+#
+# Sub-Cluster 2: The "Club House" (6,717 songs)
+# Top Genres: Deep-House, House, EDM, Electro, Latino, Reggaeton.
+# Analysis: This captures the "Steady Beat" electronic music. It’s danceable, 4-on-the-floor rhythm, likely around 120-128 BPM. It successfully pulled the "Pop/Dance" energy away from the "Aggressive" energy.
+#
+#
+# Sub-Cluster 3: The "Mainstage Rave" (5,212 songs)
+# Top Genres: Progressive-House, Hardstyle, Trance, Party, EDM.
+# Analysis: Distinct from Sub-Cluster 2. While Cluster 2 is "Groovy" (Deep House), Cluster 3 is Aggressive/Fast (Hardstyle, Trance). This is the electronic equivalent of Heavy Metal.
+#
+# Sub-Cluster 0: The "Bass & Anthems" Mixed Bag (7,074 songs)
+# Top Genres: Dubstep, World-Music, Gospel, Dub, Mandopop.
+# Analysis: This is the strangest group. Why are Gospel and Dubstep together? XD
+
+# %%
+X_clust_2 = X_clust_scaled[df_clust['cluster_1_layer'] == 2]
+
+linkage_clust_2 = linkage(X_clust_2, method='ward')
+
+# %%
+plot_dendrogram_and_elbow(linkage_clust_2, last_number_of_distances=20, p=5, title_suffix="(Cluster 2)")
+
+# %%
+k = [2, 3, 4, 5, 6, 7, 8, 9, 10, 11]
+
+grid_search_agglomerative(X_clust_2, k)
+
+# %%
+k = [12, 13, 14]
+
+grid_search_agglomerative(X_clust_2, k)
+
+# %%
+k_cluster_2 = 4
+
+# %%
+model_clust_2 = AgglomerativeClustering(n_clusters=k_cluster_2, linkage='ward')
+labels_clust_2 = model_clust_2.fit_predict(X_clust_2)
+
+# %%
+contingency_table = visualize_cluster_distribution(df_clust[df_clust['cluster_1_layer'] == 2], labels_clust_2)
+
+# %% [markdown]
+# Cluster 2
+#
+# Sub-Cluster 0: "The Mainstream Radio" (15,140 songs)
+# Top Genres: Party, Disco, Latin-Pop, House, Synth-pop, K-Pop.
+# Analysis: This represents the "General Pop" sound. It relies heavily on synthesizers, drum machines, and standard 4/4 beats. Even the "Rock" tracks here (Alt-Rock, Power-Pop) are likely the polished, radio-friendly kind.
+#
+# Sub-Cluster 1 & 2: "The Organic Rhythms" (9,359 songs combined)
+# Top Genres: Salsa, Forró, Rockabilly, Bluegrass, Samba, Rock-n-roll.
+# The Vibe: 🥁 Acoustic Drums, Brass, Guitars, Swing.
+# Analysis: This is a crucial separation! The algorithm noticed that Rockabilly (1950s) and Salsa (Latin) share something important: Complex, syncopated, human rhythms. They swing. They groove. They are not quantized like the Pop music in Sub-Cluster 0.
+#
+# Sub-Cluster 3: "The Urban Beat" (2,629 songs)
+# Top Genres: Dancehall, Reggaeton, Hip-Hop, Reggae, J-Dance.
+# The Vibe: 🔉 Bass-Heavy, Dembow Rhythms.
+# Analysis: This captures the "Urban" sound. Distinct from Disco (Cluster 0) because of the beat structure (broken beats, dembow rhythms) and the focus on sub-bass frequencies.
+
+# %%
+X_clust_4 = X_clust_scaled[df_clust['cluster_1_layer'] == 4]
+
+linkage_clust_4 = linkage(X_clust_4, method='ward')
+
+# %%
+plot_dendrogram_and_elbow(linkage_clust_4, last_number_of_distances=20, p=5, title_suffix="(Cluster 4)")
+
+# %%
+k = [3, 4, 5, 6, 7, 8, 9]
+
+grid_search_agglomerative(X_clust_4, k)
+
+# %%
+k_cluster_4 = 3
+
+# %%
+model_clust_4 = AgglomerativeClustering(n_clusters=k_cluster_4, linkage='ward')
+labels_clust_4 = model_clust_4.fit_predict(X_clust_4)
+
+# %%
+contingency_table = visualize_cluster_distribution(df_clust[df_clust['cluster_1_layer'] == 4], labels_clust_4)
+
+# %% [markdown]
+# Cluster 4
+#
+# Sub-Cluster 1: "The Grand Stage" (3,946 songs)
+# Top Genres: Opera (9.8%), Show-tunes (5.0%), Disney, Romance.
+# The Vibe: Theatrical, Orchestral, Dramatic.
+#
+# Sub-Cluster 0: "The Global Acoustic Cafe" (12,046 songs)
+# Top Genres: Tango, Honky-Tonk, Jazz, Mandopop, Acoustic, Singer-Songwriter.
+# The Vibe: Mellow, Vocal-centric, Regional.
+# Analysis: This is the "Main" body of sentimental music. It mixes "Western" mellow music (Jazz/Folk) with "Eastern/Latin" mellow music (Mandopop/Tango).
+#
+# Sub-Cluster 2: "The Middle Ground" (2,470 songs) (Better to merge to sub-cluster 0)
+# Top Genres: Opera (4.5%), Romance, Cantopop, Bluegrass.
+# The Vibe: 🤷 Ambiguous.
+
+# %%
