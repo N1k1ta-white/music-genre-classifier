@@ -555,6 +555,7 @@ print(tukey2.summary())
 #
 
 # %% cell_id="1f2ce432efe540e2a6ada68c11b3e228" deepnote_block_group="636ac9ebc27b4152a9e5e156f8754ecc" deepnote_cell_type="code" deepnote_content_hash="c085b6ba" deepnote_execution_finished_at="2026-01-27T20:26:37.212Z" deepnote_execution_started_at="2026-01-27T20:26:37.211Z" deepnote_sorting_key="44" deepnote_source="df.head()" execution_context_id="0ae8260d-c38b-4184-a2d7-2829abbcd877" execution_millis=1 execution_start=1769545597211 id="uCj_tRW3YB7Y" outputId="465639b7-485a-4e08-d7d2-43f26297d0e4" source_hash="c085b6ba"
+df = pd.read_csv("train.csv", index_col=0)
 df.head()
 
 # %% cell_id="9491e29799d0492ea3cc4c36171a4946" colab={"base_uri": "https://localhost:8080/"} deepnote_block_group="5bed78181ff440708e16d2a98e89a69a" deepnote_cell_type="code" deepnote_content_hash="20c58c7b" deepnote_execution_finished_at="2026-01-27T21:47:25.112Z" deepnote_execution_started_at="2026-01-27T21:47:24.981Z" deepnote_sorting_key="45" deepnote_source="df_cls = df.copy()\n\n# \u041f\u0440\u0435\u043c\u0430\u0445\u0432\u0430\u043d\u0435 \u043d\u0430 \u043f\u044a\u043b\u043d\u0438 \u0434\u0443\u0431\u043b\u0438\u043a\u0430\u0442\u0438\ndf_cls = df_cls.drop_duplicates()\n\n# \u041f\u0440\u0435\u043c\u0430\u0445\u0432\u0430\u043d\u0435 \u043d\u0430 \u0440\u0435\u0434\u043e\u0432\u0435 \u0441 \u043b\u0438\u043f\u0441\u0432\u0430\u0449\u0438 \u0441\u0442\u043e\u0439\u043d\u043e\u0441\u0442\u0438 (\u0432 \u0442\u043e\u0437\u0438 dataset \u043e\u0431\u0438\u043a\u043d\u043e\u0432\u0435\u043d\u043e \u0441\u0430 \u043c\u043d\u043e\u0433\u043e \u043c\u0430\u043b\u043a\u043e)\ndf_cls = df_cls.dropna()\n\n# explicit \u043f\u0440\u0435\u043e\u0431\u0440\u0430\u0437\u0443\u0432\u0430\u043c\u0435 \u043a\u044a\u043c 0/1 (int)\nif \"explicit\" in df_cls.columns:\n    df_cls[\"explicit\"] = df_cls[\"explicit\"].astype(int)\n\ndf_cls.shape" execution_context_id="17dd6f18-cfe3-4722-a34d-95bf1ec627aa" execution_millis=131 execution_start=1769550444981 id="7R0iwlFDYB7Y" outputId="749bd274-c46d-40b6-c7f0-cfdbe8eed96b" source_hash="20c58c7b"
@@ -572,7 +573,7 @@ if "explicit" in df_cls.columns:
 
 df_cls.shape
 
-# %% cell_id="135b2534d65449b6a51cf11f3e91a374" colab={"base_uri": "https://localhost:8080/", "height": 206} deepnote_block_group="1ac4a0fba2924737a181b67330104066" deepnote_cell_type="code" deepnote_content_hash="b4e731c" deepnote_execution_finished_at="2026-01-27T21:47:27.568Z" deepnote_execution_started_at="2026-01-27T21:47:27.524Z" deepnote_sorting_key="46" deepnote_source="target_col = \"track_genre\"\n\n# \u0417\u0430 features \u0438\u043c\u0430\u043c\u0435 \u0434\u0432\u0430 \u0442\u0438\u043f\u0430: \n# A\u0443\u0434\u0438\u043e \u0445\u0430\u0440\u0430\u043a\u0442\u0435\u0440\u0438\u0441\u0442\u0438\u043a\u0438 (\u043e\u043f\u0438\u0441\u0432\u0430\u0442 \u0437\u0432\u0443\u0447\u0435\u043d\u0435/\u043d\u0430\u0441\u0442\u0440\u043e\u0435\u043d\u0438\u0435) - \u043d\u0430\u043f\u0440. danceability, energy, loudness, speechiness, acousticness\n# \u0414\u043e\u043f\u044a\u043b\u043d\u0438\u0442\u0435\u043b\u043d\u0438 \u0447\u0438\u0441\u043b\u043e\u0432\u0438 \u0430\u0442\u0440\u0438\u0431\u0443\u0442\u0438 (\u043d\u0435 \u0441\u0430 \u0434\u0438\u0440\u0435\u043a\u0442\u043d\u043e \u043e\u0442 \u0430\u0443\u0434\u0438\u043e \u0441\u0438\u0433\u043d\u0430\u043b\u0430) - \u043d\u0430\u043f\u0440. popularity, duration_ms, explicit\n# \u041c\u0430\u0445\u0430\u043c\u0435 id, \u0442\u0435\u043a\u0441\u0442\u043e\u0432\u0438 \u043f\u043e\u043b\u0435\u0442\u0430 \u0438 key_name (\u0434\u0443\u0431\u043b\u0438\u0440\u0430 key, \u0442\u0435\u043a\u0441\u0442\u043e\u0432\u043e \u043f\u0440\u0435\u0434\u0441\u0442\u0430\u0432\u044f\u043d\u0435)\ndrop_cols = [\n    \"track_id\", \"artists\", \"album_name\", \"track_name\", \"key_name\"\n]\n\nfeature_cols = [c for c in df.columns if c not in drop_cols + [target_col]]\nfeature_cols\n\ndf_cls = df_cls[feature_cols + [target_col]].copy()\n\ndf_cls.head()" execution_context_id="17dd6f18-cfe3-4722-a34d-95bf1ec627aa" execution_millis=44 execution_start=1769550447524 id="LAuUtpMEYB7Y" outputId="6d9db448-3c1c-4d8d-c2d4-07aa7b7fa123" source_hash="b4e731c"
+# %%
 target_col = "track_genre"
 
 # За features имаме два типа:
@@ -586,6 +587,8 @@ drop_cols = [
 feature_cols = [c for c in df.columns if c not in drop_cols + [target_col]]
 feature_cols
 
+
+# %% cell_id="135b2534d65449b6a51cf11f3e91a374" colab={"base_uri": "https://localhost:8080/", "height": 206} deepnote_block_group="1ac4a0fba2924737a181b67330104066" deepnote_cell_type="code" deepnote_content_hash="b4e731c" deepnote_execution_finished_at="2026-01-27T21:47:27.568Z" deepnote_execution_started_at="2026-01-27T21:47:27.524Z" deepnote_sorting_key="46" deepnote_source="target_col = \"track_genre\"\n\n# \u0417\u0430 features \u0438\u043c\u0430\u043c\u0435 \u0434\u0432\u0430 \u0442\u0438\u043f\u0430: \n# A\u0443\u0434\u0438\u043e \u0445\u0430\u0440\u0430\u043a\u0442\u0435\u0440\u0438\u0441\u0442\u0438\u043a\u0438 (\u043e\u043f\u0438\u0441\u0432\u0430\u0442 \u0437\u0432\u0443\u0447\u0435\u043d\u0435/\u043d\u0430\u0441\u0442\u0440\u043e\u0435\u043d\u0438\u0435) - \u043d\u0430\u043f\u0440. danceability, energy, loudness, speechiness, acousticness\n# \u0414\u043e\u043f\u044a\u043b\u043d\u0438\u0442\u0435\u043b\u043d\u0438 \u0447\u0438\u0441\u043b\u043e\u0432\u0438 \u0430\u0442\u0440\u0438\u0431\u0443\u0442\u0438 (\u043d\u0435 \u0441\u0430 \u0434\u0438\u0440\u0435\u043a\u0442\u043d\u043e \u043e\u0442 \u0430\u0443\u0434\u0438\u043e \u0441\u0438\u0433\u043d\u0430\u043b\u0430) - \u043d\u0430\u043f\u0440. popularity, duration_ms, explicit\n# \u041c\u0430\u0445\u0430\u043c\u0435 id, \u0442\u0435\u043a\u0441\u0442\u043e\u0432\u0438 \u043f\u043e\u043b\u0435\u0442\u0430 \u0438 key_name (\u0434\u0443\u0431\u043b\u0438\u0440\u0430 key, \u0442\u0435\u043a\u0441\u0442\u043e\u0432\u043e \u043f\u0440\u0435\u0434\u0441\u0442\u0430\u0432\u044f\u043d\u0435)\ndrop_cols = [\n    \"track_id\", \"artists\", \"album_name\", \"track_name\", \"key_name\"\n]\n\nfeature_cols = [c for c in df.columns if c not in drop_cols + [target_col]]\nfeature_cols\n\ndf_cls = df_cls[feature_cols + [target_col]].copy()\n\ndf_cls.head()" execution_context_id="17dd6f18-cfe3-4722-a34d-95bf1ec627aa" execution_millis=44 execution_start=1769550447524 id="LAuUtpMEYB7Y" outputId="6d9db448-3c1c-4d8d-c2d4-07aa7b7fa123" source_hash="b4e731c"
 df_cls = df_cls[feature_cols + [target_col]].copy()
 
 df_cls.head()
@@ -1099,7 +1102,7 @@ if "explicit" in df_clust.columns:
 
 print(f"Размер на данните за клъстеризация: {df_clust.shape}")
 
-# %% colab={"base_uri": "https://localhost:8080/", "height": 241} id="Ibo_NzeNYB7d" outputId="dce724c1-15a2-4400-958d-45e7d4526762"
+# %%
 # Избор на аудио признаци за клъстеризация
 # Фокусираме се върху характеристики, описващи звучене и настроение
 audio_features = [
@@ -1114,6 +1117,7 @@ audio_features = [
     "tempo"             # Темпо (BPM)
 ]
 
+# %% colab={"base_uri": "https://localhost:8080/", "height": 241} id="Ibo_NzeNYB7d" outputId="dce724c1-15a2-4400-958d-45e7d4526762"
 # Махаме track_genre (нямаме target variable при unsupervised learning)
 # Махаме text columns и ID-та
 X_clust = df_clust[audio_features].copy()
@@ -1238,9 +1242,11 @@ axes[2].set_title("Hierarchical Clustering Dendrogram (Super-Genres) (Average Li
 plt.tight_layout()
 plt.show()
 
-# %% id="l7djA6OOYB7f" outputId="9eb6dafc-3585-44a5-b856-45a946de2128"
+# %%
 import matplotlib.pyplot as plt
 import numpy as np
+
+# %% id="l7djA6OOYB7f" outputId="9eb6dafc-3585-44a5-b856-45a946de2128"
 
 last_number_of_distances = 70
 # Взимаме последните 20 дистанции за всеки linkage метод
@@ -2183,6 +2189,7 @@ df_classified.head()
 
 # %%
 # df_classified.to_csv("classified_songs_dataset.csv", index=False)
+df_classified = pd.read_csv("classified_songs_dataset.csv")
 
 # %% colab={"base_uri": "https://localhost:8080/"} id="Cl3FRFooYB7o" outputId="5f51731f-5140-483e-b932-b6cf29226003"
 df_classified.shape
@@ -2199,8 +2206,21 @@ df_classified.describe()
 from sklearn.preprocessing import StandardScaler
 
 # %% id="RuUfOwugYB7o"
+# ============================================================
+# PREPROCESSING (NO OneHotEncoding - ordinal for categorical)
+# ============================================================
+# Categorical as ordinal (trees handle this efficiently)
+# Only continuous features are scaled
+
+genre_feature_cols = [c for c in df_classified.columns if c not in ['track_genre', 'class']]
+
+categorical_cols = ['key', 'time_signature', 'mode', 'explicit']
+continuous_features = [c for c in genre_feature_cols if c not in categorical_cols]
+
+# Extract arrays
 features_superclass = df_classified[audio_features].values
-features_genre = df_classified.drop(['track_genre', 'class'], axis=1).values
+features_genre_continuous = df_classified[continuous_features].values
+features_genre_categorical = df_classified[categorical_cols].values
 
 superclass_labels = df_classified["class"].values
 genre_labels = df_classified["track_genre"].values
@@ -2208,40 +2228,87 @@ genre_labels = df_classified["track_genre"].values
 indices = np.arange(len(df_classified))
 
 train_idx, test_idx, superclass_train, superclass_test = train_test_split(
-    indices,
-    superclass_labels,
-    test_size=0.2,
-    random_state=42,
-    stratify=superclass_labels
+    indices, superclass_labels, test_size=0.2, random_state=42, stratify=superclass_labels
 )
 
+# Split features
 X_train_superclass = features_superclass[train_idx]
 X_test_superclass = features_superclass[test_idx]
 
-X_train_genre = features_genre[train_idx]
-X_test_genre = features_genre[test_idx]
+X_train_genre_cont = features_genre_continuous[train_idx]
+X_test_genre_cont = features_genre_continuous[test_idx]
+X_train_genre_cat = features_genre_categorical[train_idx]
+X_test_genre_cat = features_genre_categorical[test_idx]
 
 genre_train = genre_labels[train_idx]
 genre_test = genre_labels[test_idx]
+
+# ============================================================
+# SCALE CONTINUOUS ONLY
+# ============================================================
 
 scaler_superclass = StandardScaler()
 X_train_superclass = scaler_superclass.fit_transform(X_train_superclass)
 X_test_superclass = scaler_superclass.transform(X_test_superclass)
 
 scaler_genre = StandardScaler()
-X_train_genre = scaler_genre.fit_transform(X_train_genre)
-X_test_genre = scaler_genre.transform(X_test_genre)
+X_train_genre_cont_scaled = scaler_genre.fit_transform(X_train_genre_cont)
+X_test_genre_cont_scaled = scaler_genre.transform(X_test_genre_cont)
 
-print(f"Train size: {len(train_idx)}, Test size: {len(test_idx)}")
-print(f"Superclass features shape: {X_train_superclass.shape}")
-print(f"Genre features shape: {X_train_genre.shape}")
-print("Data scaled with StandardScaler")
+# Combine: scaled continuous + ordinal categorical
+X_train_genre = np.hstack([X_train_genre_cont_scaled, X_train_genre_cat])
+X_test_genre = np.hstack([X_test_genre_cont_scaled, X_test_genre_cat])
+
+print(f"Train: {len(train_idx)}, Test: {len(test_idx)}")
+print(f"Superclass features: {X_train_superclass.shape[1]}")
+print(f"Genre features: {X_train_genre.shape[1]}")
+print(f"  - Continuous (scaled): {len(continuous_features)}")
+print(f"  - Categorical (ordinal): {len(categorical_cols)}")
+
+# %% [markdown]
+# ## Feature Engineering: PolynomialFeatures + Per-Superclass Random Forest Feature Selection
+#
+# **Preprocessing:**
+# - **Continuous features**: StandardScaler → PolynomialFeatures(degree=2)
+# - **Categorical features** (key, time_signature, mode, explicit): ordinal (no OneHot)
+#
+# **Feature selection:**
+# - Per-superclass Random Forest feature importance
+# - Select top features based on importance threshold
+
+# %%
+from sklearn.preprocessing import PolynomialFeatures
+import warnings
+
+# ============================================================
+# POLYNOMIAL FEATURES (on continuous only)
+# ============================================================
+poly_genre = PolynomialFeatures(degree=2, include_bias=False)
+
+X_train_genre_cont_poly = poly_genre.fit_transform(X_train_genre_cont_scaled)
+X_test_genre_cont_poly = poly_genre.transform(X_test_genre_cont_scaled)
+
+# Combine: poly continuous + ordinal categorical
+X_train_genre_poly = np.hstack([X_train_genre_cont_poly, X_train_genre_cat])
+X_test_genre_poly = np.hstack([X_test_genre_cont_poly, X_test_genre_cat])
+
+print("Feature shapes:")
+print(f"  Superclass: {X_train_superclass.shape[1]} features")
+print(f"  Genre (poly): {X_train_genre_poly.shape[1]} features")
+print(f"    - Poly continuous: {X_train_genre_cont_poly.shape[1]}")
+print(f"    - Categorical (ordinal): {X_train_genre_cat.shape[1]}")
+print("\nRandom Forest feature selection will be applied per-superclass")
 
 # %%
 # !pip install catboost
 
 # %% id="EzPY2hZHrvkZ"
 from catboost import CatBoostClassifier
+import os
+
+# Use all available CPU cores for parallel processing
+N_JOBS = -1  # -1 means use all available cores
+THREAD_COUNT = os.cpu_count() or 4  # For CatBoost which uses thread_count
 
 def make_candidate_models(random_state=67):
     return {
@@ -2253,24 +2320,24 @@ def make_candidate_models(random_state=67):
             random_state=random_state
         ),
 
-        "knn": KNeighborsClassifier(n_neighbors=15, n_jobs=1),
+        "knn": KNeighborsClassifier(n_neighbors=15, n_jobs=N_JOBS),
 
-        "logreg": LogisticRegression(
-            max_iter=2000,
-            n_jobs=1,
-            class_weight="balanced",
-            random_state=random_state
-        ),
+        # "logreg": LogisticRegression(
+        #     max_iter=2000,
+        #     n_jobs=N_JOBS,
+        #     class_weight="balanced",
+        #     random_state=random_state
+        # ),
 
-        "linsvc": LinearSVC(
-            class_weight="balanced",
-            random_state=random_state
-        ),
+        # "linsvc": LinearSVC(
+        #     class_weight="balanced",
+        #     random_state=random_state
+        # ),
 
         "rf": RandomForestClassifier(
             n_estimators=400,
             random_state=random_state,
-            n_jobs=1,
+            n_jobs=N_JOBS,
             class_weight="balanced_subsample"
         ),
 
@@ -2281,13 +2348,13 @@ def make_candidate_models(random_state=67):
             subsample=0.8,
             colsample_bytree=0.8,
             random_state=random_state,
-            n_jobs=1
+            n_jobs=N_JOBS
         ),
 
         "extratrees": ExtraTreesClassifier(
             n_estimators=600,
             random_state=random_state,
-            n_jobs=1,
+            n_jobs=N_JOBS,
             class_weight="balanced_subsample"
         ),
 
@@ -2305,7 +2372,7 @@ def make_candidate_models(random_state=67):
             random_seed=random_state,
             verbose=0,
             auto_class_weights="Balanced",
-            thread_count=1
+            thread_count=THREAD_COUNT
         )
     }
 
@@ -2336,10 +2403,11 @@ def choose_best_model(candidates, X_train_local, y_train_local, X_eval, y_eval, 
 
 # %% colab={"base_uri": "https://localhost:8080/"} id="QQcDwqSVr2Je" outputId="3b76df8f-fd2e-459d-8018-1e9e95a75197"
 # Първи слой: модел за superclass (6 класа)
+# Using original scaled features (already achieves excellent results ~95%+)
 superclass_candidates = make_candidate_models()
 best_superclass_name, superclass_model, superclass_metrics = choose_best_model(
     superclass_candidates,
-    X_train_superclass, superclass_train,
+    X_train_superclass, superclass_train,  # Original scaled features
     X_test_superclass, superclass_test,
     pick_metric="macro_f1"
 )
@@ -2364,6 +2432,8 @@ import numpy as np
 from scipy.stats import uniform, randint, loguniform
 import os
 
+# Use all available CPU cores for parallel processing (-1 = all cores)
+N_JOBS_SEARCH = -1
 
 PARAM_GRIDS = {
     "knn": {
@@ -2373,21 +2443,21 @@ PARAM_GRIDS = {
         "p": [1, 2]
     },
     
-    "logreg": {
-        "C": [0.1, 1.0, 10.0, 50.0],
-        "penalty": ["l2"],
-        "solver": ["lbfgs"],
-        "max_iter": [2000]     
-    },
+    # "logreg": {
+    #     "C": [0.1, 1.0, 10.0, 50.0],
+    #     "penalty": ["l2"],
+    #     "solver": ["lbfgs"],
+    #     "max_iter": [2000]     
+    # },
     
-    "linsvc": {
-        "C": [0.5, 1.0, 5.0, 10.0],
-        "loss": ["squared_hinge"],  
-        "max_iter": [2000]
-    },
+    # "linsvc": {
+    #     "C": [0.5, 1.0, 5.0, 10.0],
+    #     "loss": ["squared_hinge"],  
+    #     "max_iter": [2000]
+    # },
     
     "mlp": {
-        "hidden_layer_sizes": [(256,), (128,), (256, 128), (128, 64)],
+        "hidden_layer_sizes": [(256,), (128,), (128, 64)],
         "alpha": [1e-4, 1e-3, 1e-2],  
         "learning_rate_init": [0.001, 0.0005],
         "learning_rate": ["adaptive"],
@@ -2453,7 +2523,7 @@ def safe_cv_splits(y, max_cv=3):
     cv = min(max_cv, int(min_count))
     return cv if cv >= 2 else 0
 
-def grid_search_best_only(best_name, candidates, X_tr, y_tr, scoring="f1_macro", n_jobs=5, n_iter=15):
+def grid_search_best_only(best_name, candidates, X_tr, y_tr, scoring="f1_macro", n_jobs=N_JOBS_SEARCH, n_iter=15):
     if best_name not in PARAM_GRIDS:
         return None, None
 
@@ -2479,42 +2549,87 @@ def grid_search_best_only(best_name, candidates, X_tr, y_tr, scoring="f1_macro",
 
 # %% colab={"base_uri": "https://localhost:8080/"} id="hxcPlWWer7IY" outputId="cb2250a4-8ca4-41f0-9ec9-07d2e1ebb2ec"
 # Втори слой: модел за genre във всеки superclass
-# - тренираме отделен модел за всеки superclass
-# - отделен LabelEncoder за жанровете вътре в този superclass
+# - Per-superclass Random Forest feature importance
+# - Selected features used for ALL models
+
 genre_model_by_superclass = {}
 genre_encoder_by_superclass = {}
 genre_best_params_by_superclass = {}
 genre_metrics_by_superclass = {}
+genre_rf_mask_by_superclass = {}  # RF importance masks
 
 unique_superclasses = sorted(np.unique(superclass_train))
+
+print("Training genre models with per-superclass Random Forest feature selection...\n")
 
 for sc in unique_superclasses:
     train_in_sc = (superclass_train == sc)
     test_in_sc = (superclass_test == sc)
 
-    train_features_sc = X_train_genre[train_in_sc]
-    test_features_sc = X_test_genre[test_in_sc]
+    train_features_sc_poly = X_train_genre_poly[train_in_sc]
+    test_features_sc_poly = X_test_genre_poly[test_in_sc]
 
     train_genres_sc = np.array(genre_train)[train_in_sc]
     test_genres_sc = np.array(genre_test)[test_in_sc]
 
-    # Ако класът е твърде малък, няма да има смисъл и стабилност
-    if len(train_features_sc) < 200:
+    if len(train_features_sc_poly) < 200:
+        print(f"[GENRE | sc={sc}] SKIPPED - too few samples ({len(train_features_sc_poly)})")
         continue
 
     genre_encoder = LabelEncoder()
     train_genre_ids_sc = genre_encoder.fit_transform(train_genres_sc)
 
-    # Ако в този superclass има само 1 жанр -> няма класификация
     if len(genre_encoder.classes_) < 2:
+        print(f"[GENRE | sc={sc}] SKIPPED - only 1 genre")
         continue
 
-    # Тест: взимаме само жанровете, които се срещат в train (за да не се чупи encoder)
+    # ============================================================
+    # PER-SUPERCLASS RANDOM FOREST FEATURE SELECTION
+    # ============================================================
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore")
+        
+        # Train RF for feature importance
+        rf_selector = RandomForestClassifier(
+            n_estimators=100,
+            max_depth=10,
+            n_jobs=-1,
+            random_state=42,
+            class_weight="balanced_subsample"
+        )
+        rf_selector.fit(train_features_sc_poly, train_genre_ids_sc)
+        
+        # Get feature importances
+        importances = rf_selector.feature_importances_
+        
+        # CUMULATIVE IMPORTANCE: select fewest features capturing 90% of total importance
+        cumulative_threshold = 0.90
+        sorted_indices = np.argsort(importances)[::-1]  # Descending order
+        sorted_importances = importances[sorted_indices]
+        cumsum = np.cumsum(sorted_importances)
+        total_importance = cumsum[-1]
+        
+        # Find how many features needed to reach threshold
+        n_features_needed = np.searchsorted(cumsum, cumulative_threshold * total_importance) + 1
+        n_features_needed = max(n_features_needed, 10)  # At least 10 features
+        
+        # Create mask for selected features
+        selected_indices = sorted_indices[:n_features_needed]
+        selected_mask_sc = np.zeros(len(importances), dtype=bool)
+        selected_mask_sc[selected_indices] = True
+        
+        train_features_sc = train_features_sc_poly[:, selected_mask_sc]
+        test_features_sc = test_features_sc_poly[:, selected_mask_sc]
+        
+        genre_rf_mask_by_superclass[int(sc)] = selected_mask_sc
+
+    n_selected = selected_mask_sc.sum()
+    n_total = train_features_sc_poly.shape[1]
+    
     test_genre_is_known = np.isin(test_genres_sc, genre_encoder.classes_)
     test_features_known = test_features_sc[test_genre_is_known]
     test_genre_ids_known = genre_encoder.transform(test_genres_sc[test_genre_is_known])
 
-    # Ако нямаме никакви валидни test примери, пак може да тренираме, но няма какво да мерим
     genre_candidates = make_candidate_models()
     best_genre_name, best_genre_model, best_genre_metrics = choose_best_model(
         genre_candidates,
@@ -2523,7 +2638,7 @@ for sc in unique_superclasses:
         pick_metric="macro_f1"
     ) if len(test_features_known) > 0 else (None, None, None)
 
-    # ---- GRID SEARCH (само за най-добрия модел) ----
+    # Grid search for best model
     tuned_model = None
     tuned_params = None
     tuned_metrics = best_genre_metrics
@@ -2535,9 +2650,9 @@ for sc in unique_superclasses:
             X_tr=train_features_sc,
             y_tr=train_genre_ids_sc,
             scoring="f1_macro",
+            n_iter=35
         )
 
-        # ако grid search е минал успешно -> оценяваме tuned модела върху test_known
         if tuned_model is not None:
             tuned_metrics = evaluate_model(tuned_model, test_features_known, test_genre_ids_known)
             best_genre_model = tuned_model
@@ -2545,7 +2660,6 @@ for sc in unique_superclasses:
 
     genre_best_params_by_superclass[int(sc)] = tuned_params
 
-    # Ако няма тест за мерене, просто тренираме с предпочитан модел
     if best_genre_model is None:
         best_genre_name = "rf"
         best_genre_model = make_candidate_models()["rf"]
@@ -2557,11 +2671,75 @@ for sc in unique_superclasses:
     genre_metrics_by_superclass[int(sc)] = (best_genre_name, best_genre_metrics, len(genre_encoder.classes_), len(train_features_sc), len(test_features_known))
 
     print(f"[GENRE | sc={sc}] best={best_genre_name} | acc={best_genre_metrics['acc']:.4f} | macro_f1={best_genre_metrics['macro_f1']:.4f} "
-          f"| genres={len(genre_encoder.classes_)} | train={len(train_features_sc)} | test_known={len(test_features_known)}")
+          f"| genres={len(genre_encoder.classes_)} | features={n_selected}/{n_total} | train={len(train_features_sc)} | test={len(test_features_known)}")
+
+print(f"\n✓ Per-superclass Random Forest feature selection applied to ALL models")
+
+# %%
+# ============================================================
+# STORE TRANSFORMERS FOR INFERENCE
+# ============================================================
+
+feature_engineering_pipeline = {
+    'scaler_superclass': scaler_superclass,
+    'scaler_genre': scaler_genre,
+    'poly_genre': poly_genre,
+    'genre_rf_masks': genre_rf_mask_by_superclass,
+}
+
+print("Feature engineering pipeline saved.")
+print("  Superclass: StandardScaler")
+print("  Genre: StandardScaler → PolynomialFeatures → per-superclass RF selection")
+
+# %%
+# ============================================================
+# VISUALIZE PER-SUPERCLASS FEATURE SELECTION
+# ============================================================
+import matplotlib.pyplot as plt
+
+# Get feature names
+poly_feature_names = list(poly_genre.get_feature_names_out()) + categorical_cols
+
+# Create visualization
+fig, axes = plt.subplots(2, 3, figsize=(18, 10))
+axes = axes.flatten()
+
+colors = ['steelblue', 'coral', 'seagreen', 'purple', 'orange', 'crimson']
+
+for idx, (sc, mask) in enumerate(sorted(genre_rf_mask_by_superclass.items())):
+    if idx >= 6:
+        break
+    
+    ax = axes[idx]
+    n_selected = mask.sum()
+    n_total = len(mask)
+    
+    ax.bar(['Selected', 'Removed'], [n_selected, n_total - n_selected], 
+           color=[colors[idx], 'lightgray'])
+    ax.set_title(f'Superclass {sc}\n{n_selected}/{n_total} features ({100*n_selected/n_total:.1f}%)')
+    ax.set_ylabel('Number of features')
+
+for idx in range(len(genre_rf_mask_by_superclass), 6):
+    axes[idx].set_visible(False)
+
+plt.suptitle('Per-Superclass Random Forest Feature Selection', fontsize=14, fontweight='bold')
+plt.tight_layout()
+plt.show()
+
+print("\nFeature selection summary by superclass:")
+for sc, mask in sorted(genre_rf_mask_by_superclass.items()):
+    n_selected = mask.sum()
+    n_total = len(mask)
+    print(f"  Superclass {sc}: {n_selected:3d}/{n_total} features ({100*n_selected/n_total:.1f}%)")
 
 
 # %% id="f_nOxziHq6RO"
-def predict_two_stage(features_superclass, features_array):
+def predict_two_stage(features_superclass, features_genre_poly):
+    """
+    Two-stage prediction:
+    1. Superclass prediction
+    2. Genre prediction with per-superclass RF-selected features
+    """
     predicted_superclasses = superclass_model.predict(features_superclass)
     predicted_genres = []
 
@@ -2574,15 +2752,18 @@ def predict_two_stage(features_superclass, features_array):
 
         model = genre_model_by_superclass[sc]
         encoder = genre_encoder_by_superclass[sc]
-
-        predicted_genre_id = int(model.predict(features_array[i:i+1])[0])
+        rf_mask = genre_rf_mask_by_superclass[sc]
+        
+        sample_features = features_genre_poly[i:i+1, rf_mask]
+        predicted_genre_id = int(model.predict(sample_features)[0])
         predicted_genres.append(encoder.inverse_transform([predicted_genre_id])[0])
 
     return predicted_superclasses, np.array(predicted_genres, dtype=object)
 
 
 # %% colab={"base_uri": "https://localhost:8080/"} id="PH0o3vewrD-N" outputId="e13c48da-4aba-410d-f026-1149eee873c6"
-pred_super_test, pred_genre_test = predict_two_stage(X_test_superclass, X_test_genre)
+# Evaluate two-stage model
+pred_super_test, pred_genre_test = predict_two_stage(X_test_superclass, X_test_genre_poly)
 
 print(f"[E2E SUPERCLASS] acc={accuracy_score(superclass_test, pred_super_test):.4f} | macro_f1={f1_score(superclass_test, pred_super_test, average='macro'):.4f}")
 
